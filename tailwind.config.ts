@@ -52,6 +52,23 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				brand: {
+					50: '#e6f8fa',
+					100: '#ccf1f5',
+					200: '#99e3eb',
+					300: '#66d5e1',
+					400: '#33c7d7',
+					500: '#00b9cd',
+					600: '#0094a4',
+					700: '#006f7b',
+					800: '#004a52',
+					900: '#002529',
+				},
+				inventory: {
+					low: '#ef4444',
+					medium: '#f59e0b',
+					high: '#10b981',
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
