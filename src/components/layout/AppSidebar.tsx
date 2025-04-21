@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
@@ -12,6 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
 
 type NavItem = {
   title: string;
@@ -65,6 +65,7 @@ const bottomNavItems: NavItem[] = [
 export function AppSidebar() {
   const [expanded, setExpanded] = useState(true);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   const toggleSidebar = () => {
     setExpanded(!expanded);
@@ -112,15 +113,26 @@ export function AppSidebar() {
             isActive={location.pathname.startsWith(item.href)}
           />
         ))}
-        <NavItem
-          item={{
-            title: "Logout",
-            icon: LogOut,
-            href: "#",
-          }}
-          expanded={expanded}
-          isActive={false}
-        />
+        {user ? (
+          <Button
+            variant="ghost"
+            className="flex items-center"
+            onClick={() => signOut()}
+          >
+            <LogOut className="h-5 w-5 mr-3" />
+            {expanded && <span>Logout</span>}
+          </Button>
+        ) : (
+          <NavItem
+            item={{
+              title: "Logout",
+              icon: LogOut,
+              href: "#",
+            }}
+            expanded={expanded}
+            isActive={false}
+          />
+        )}
       </nav>
     </div>
   );

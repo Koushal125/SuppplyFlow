@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Table,
@@ -39,117 +38,14 @@ export type InventoryItem = {
   stock: number;
   threshold: number;
   lastUpdated: string;
+  last_updated?: string;
 };
 
-const inventoryData: InventoryItem[] = [
-  {
-    id: "INV001",
-    name: "Wireless Earbuds",
-    sku: "ELEC-001",
-    category: "Electronics",
-    price: 89.99,
-    stock: 45,
-    threshold: 20,
-    lastUpdated: "2023-10-15",
-  },
-  {
-    id: "INV002",
-    name: "Smart Watch",
-    sku: "ELEC-002",
-    category: "Electronics",
-    price: 199.99,
-    stock: 12,
-    threshold: 15,
-    lastUpdated: "2023-10-10",
-  },
-  {
-    id: "INV003",
-    name: "Running Shoes",
-    sku: "SHOE-001",
-    category: "Clothing",
-    price: 129.99,
-    stock: 56,
-    threshold: 25,
-    lastUpdated: "2023-10-18",
-  },
-  {
-    id: "INV004",
-    name: "Desk Lamp",
-    sku: "HOME-001",
-    category: "Home & Living",
-    price: 49.99,
-    stock: 78,
-    threshold: 30,
-    lastUpdated: "2023-10-05",
-  },
-  {
-    id: "INV005",
-    name: "Protein Powder",
-    sku: "HEALTH-001",
-    category: "Health",
-    price: 59.99,
-    stock: 25,
-    threshold: 20,
-    lastUpdated: "2023-10-12",
-  },
-  {
-    id: "INV006",
-    name: "Coffee Maker",
-    sku: "HOME-002",
-    category: "Home & Living",
-    price: 129.99,
-    stock: 18,
-    threshold: 15,
-    lastUpdated: "2023-10-08",
-  },
-  {
-    id: "INV007",
-    name: "Yoga Mat",
-    sku: "HEALTH-002",
-    category: "Health",
-    price: 35.99,
-    stock: 42,
-    threshold: 20,
-    lastUpdated: "2023-10-14",
-  },
-  {
-    id: "INV008",
-    name: "Bluetooth Speaker",
-    sku: "ELEC-003",
-    category: "Electronics",
-    price: 149.99,
-    stock: 5,
-    threshold: 10,
-    lastUpdated: "2023-10-16",
-  },
-  {
-    id: "INV009",
-    name: "Denim Jeans",
-    sku: "CLOTH-001",
-    category: "Clothing",
-    price: 79.99,
-    stock: 65,
-    threshold: 30,
-    lastUpdated: "2023-10-11",
-  },
-  {
-    id: "INV010",
-    name: "Gaming Mouse",
-    sku: "ELEC-004",
-    category: "Electronics",
-    price: 69.99,
-    stock: 28,
-    threshold: 15,
-    lastUpdated: "2023-10-09",
-  }
-];
+import { useInventory } from "@/hooks/useInventory";
+import { InventoryAddDialog } from "./InventoryAddDialog";
+import { toast } from "@/components/ui/use-toast";
 
-function getStockStatus(stock: number, threshold: number) {
-  if (stock <= threshold / 2) return "low";
-  if (stock <= threshold) return "medium";
-  return "high";
-}
-
+// Remove mock data, get categories dynamically
 const categories = [
   "All Categories",
   "Electronics",
@@ -157,6 +53,12 @@ const categories = [
   "Home & Living",
   "Health",
 ];
+
+function getStockStatus(stock: number, threshold: number) {
+  if (stock <= threshold / 2) return "low";
+  if (stock <= threshold) return "medium";
+  return "high";
+}
 
 export function InventoryTable() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -166,34 +68,42 @@ export function InventoryTable() {
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
 
+  const { data, isLoading, error, deleteItem } = useInventory();
+
+  if (isLoading) {
+    return <div>Loading inventory...</div>;
+  }
+  if (error) {
+    return <div className="text-destructive">Failed to load inventory items.</div>;
+  }
+
   // Filter inventory data based on search query and category
-  const filteredData = inventoryData.filter((item) => {
+  const filteredData = (data || []).filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.sku.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
-      selectedCategory === "All Categories" ||
-      item.category === selectedCategory;
+      selectedCategory === "All Categories" || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   // Sort data based on sort configuration
   const sortedData = [...filteredData].sort((a, b) => {
     if (!sortConfig.key) return 0;
-    
-    const aValue = a[sortConfig.key];
-    const bValue = b[sortConfig.key];
-    
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortConfig.direction === 'asc' 
+
+    const aValue = a[sortConfig.key as keyof typeof a];
+    const bValue = b[sortConfig.key as keyof typeof b];
+
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortConfig.direction === "asc"
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
-    } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sortConfig.direction === 'asc'
+    } else if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortConfig.direction === "asc"
         ? aValue - bValue
         : bValue - aValue;
     }
-    
+
     return 0;
   });
 
@@ -201,11 +111,18 @@ export function InventoryTable() {
   const handleSort = (key: keyof InventoryItem) => {
     setSortConfig({
       key,
-      direction:
-        sortConfig.key === key && sortConfig.direction === "asc"
-          ? "desc"
-          : "asc",
+      direction: sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc",
     });
+  };
+
+  // Deletion
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteItem.mutateAsync(id);
+      toast({ title: "Item deleted", description: "The inventory item was deleted." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Failed to delete", description: err.message });
+    }
   };
 
   return (
@@ -222,24 +139,16 @@ export function InventoryTable() {
           />
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-          <Select
+          <select
+            className="border rounded px-4 py-2 h-10"
             value={selectedCategory}
-            onValueChange={setSelectedCategory}
+            onChange={e => setSelectedCategory(e.target.value)}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button className="flex items-center gap-1">
-            <Plus className="h-4 w-4" /> Add Item
-          </Button>
+            {categories.map((category) => (
+              <option key={category}>{category}</option>
+            ))}
+          </select>
+          <InventoryAddDialog />
         </div>
       </div>
 
@@ -247,71 +156,41 @@ export function InventoryTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
+              <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">
                   Product Name
-                  {sortConfig.key === "name" && (
-                    <ChevronsUpDown className="h-4 w-4" />
-                  )}
+                  {sortConfig.key === "name" && <ChevronsUpDown className="h-4 w-4" />}
                 </div>
               </TableHead>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => handleSort("sku")}
-              >
+              <TableHead className="cursor-pointer" onClick={() => handleSort("sku")}>
                 <div className="flex items-center gap-1">
                   SKU
-                  {sortConfig.key === "sku" && (
-                    <ChevronsUpDown className="h-4 w-4" />
-                  )}
+                  {sortConfig.key === "sku" && <ChevronsUpDown className="h-4 w-4" />}
                 </div>
               </TableHead>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => handleSort("category")}
-              >
+              <TableHead className="cursor-pointer" onClick={() => handleSort("category")}>
                 <div className="flex items-center gap-1">
                   Category
-                  {sortConfig.key === "category" && (
-                    <ChevronsUpDown className="h-4 w-4" />
-                  )}
+                  {sortConfig.key === "category" && <ChevronsUpDown className="h-4 w-4" />}
                 </div>
               </TableHead>
-              <TableHead
-                className="text-right cursor-pointer"
-                onClick={() => handleSort("price")}
-              >
+              <TableHead className="text-right cursor-pointer" onClick={() => handleSort("price")}>
                 <div className="flex items-center justify-end gap-1">
                   Price
-                  {sortConfig.key === "price" && (
-                    <ChevronsUpDown className="h-4 w-4" />
-                  )}
+                  {sortConfig.key === "price" && <ChevronsUpDown className="h-4 w-4" />}
                 </div>
               </TableHead>
-              <TableHead
-                className="text-right cursor-pointer"
-                onClick={() => handleSort("stock")}
-              >
+              <TableHead className="text-right cursor-pointer" onClick={() => handleSort("stock")}>
                 <div className="flex items-center justify-end gap-1">
                   Stock
-                  {sortConfig.key === "stock" && (
-                    <ChevronsUpDown className="h-4 w-4" />
-                  )}
+                  {sortConfig.key === "stock" && <ChevronsUpDown className="h-4 w-4" />}
                 </div>
               </TableHead>
               <TableHead className="text-right">Status</TableHead>
-              <TableHead
-                className="text-right cursor-pointer"
-                onClick={() => handleSort("lastUpdated")}
-              >
+              <TableHead className="text-right cursor-pointer" onClick={() => handleSort("lastUpdated")}>
                 <div className="flex items-center justify-end gap-1">
                   Last Updated
-                  {sortConfig.key === "lastUpdated" && (
-                    <ChevronsUpDown className="h-4 w-4" />
-                  )}
+                  {sortConfig.key === "lastUpdated" && <ChevronsUpDown className="h-4 w-4" />}
                 </div>
               </TableHead>
               <TableHead className="w-[80px]"></TableHead>
@@ -324,30 +203,26 @@ export function InventoryTable() {
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>{item.sku}</TableCell>
                   <TableCell>{item.category}</TableCell>
-                  <TableCell className="text-right">
-                    ${item.price.toFixed(2)}
-                  </TableCell>
+                  <TableCell className="text-right">${item.price?.toFixed(2)}</TableCell>
                   <TableCell className="text-right">{item.stock}</TableCell>
                   <TableCell className="text-right">
                     <Badge
                       className={cn(
                         getStockStatus(item.stock, item.threshold) === "low"
                           ? "bg-red-100 text-red-800 hover:bg-red-100 hover:text-red-800"
-                          : getStockStatus(item.stock, item.threshold) ===
-                            "medium"
+                          : getStockStatus(item.stock, item.threshold) === "medium"
                           ? "bg-amber-100 text-amber-800 hover:bg-amber-100 hover:text-amber-800"
                           : "bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800"
                       )}
                     >
                       {getStockStatus(item.stock, item.threshold) === "low"
                         ? "Low"
-                        : getStockStatus(item.stock, item.threshold) ===
-                          "medium"
+                        : getStockStatus(item.stock, item.threshold) === "medium"
                         ? "Medium"
                         : "High"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">{item.lastUpdated}</TableCell>
+                  <TableCell className="text-right">{item.last_updated || item.lastUpdated}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -359,13 +234,9 @@ export function InventoryTable() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
-                          <Edit className="mr-2 h-4 w-4" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
-                          <Check className="mr-2 h-4 w-4" /> Update Stock
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer text-destructive">
+                        {/* <DropdownMenuItem>Edit...</DropdownMenuItem> */}
+                        {/* <DropdownMenuItem>Update Stock</DropdownMenuItem> */}
+                        <DropdownMenuItem className="cursor-pointer text-destructive" onClick={() => handleDelete(item.id)}>
                           <Trash className="mr-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -386,3 +257,5 @@ export function InventoryTable() {
     </div>
   );
 }
+
+// This file has gotten very long! Consider asking Lovable to refactor it soon.
