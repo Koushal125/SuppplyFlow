@@ -22,9 +22,18 @@ export function useInventory() {
   // Add item
   const addItem = useMutation({
     mutationFn: async (item: Omit<TablesInsert<"inventory_items">, "user_id" | "id" | "created_at" | "last_updated">) => {
+      // Get the current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error("Failed to get current user. Please login again.");
       const { data, error } = await supabase
         .from("inventory_items")
-        .insert([{ ...item, last_updated: new Date().toISOString().slice(0,10) }]);
+        .insert([
+          {
+            ...item,
+            user_id: user.id,
+            last_updated: new Date().toISOString().slice(0, 10),
+          },
+        ]);
       if (error) throw error;
       return data;
     },

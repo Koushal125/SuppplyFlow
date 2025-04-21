@@ -127,20 +127,20 @@ export function InventoryTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search inventory..."
-            className="pl-8"
+            className="pl-8 w-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+        <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row sm:items-center">
           <select
-            className="border rounded px-4 py-2 h-10"
+            className="border rounded px-4 py-2 h-10 w-full sm:w-auto"
             value={selectedCategory}
             onChange={e => setSelectedCategory(e.target.value)}
           >
@@ -152,7 +152,7 @@ export function InventoryTable() {
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -187,10 +187,10 @@ export function InventoryTable() {
                 </div>
               </TableHead>
               <TableHead className="text-right">Status</TableHead>
-              <TableHead className="text-right cursor-pointer" onClick={() => handleSort("lastUpdated")}>
+              <TableHead className="text-right cursor-pointer" onClick={() => handleSort("last_updated")}>
                 <div className="flex items-center justify-end gap-1">
                   Last Updated
-                  {sortConfig.key === "lastUpdated" && <ChevronsUpDown className="h-4 w-4" />}
+                  {sortConfig.key === "last_updated" && <ChevronsUpDown className="h-4 w-4" />}
                 </div>
               </TableHead>
               <TableHead className="w-[80px]"></TableHead>
@@ -222,7 +222,7 @@ export function InventoryTable() {
                         : "High"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">{item.last_updated || item.lastUpdated}</TableCell>
+                  <TableCell className="text-right">{item.last_updated}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -234,8 +234,6 @@ export function InventoryTable() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        {/* <DropdownMenuItem>Edit...</DropdownMenuItem> */}
-                        {/* <DropdownMenuItem>Update Stock</DropdownMenuItem> */}
                         <DropdownMenuItem className="cursor-pointer text-destructive" onClick={() => handleDelete(item.id)}>
                           <Trash className="mr-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
