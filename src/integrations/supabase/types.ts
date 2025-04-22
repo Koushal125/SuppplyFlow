@@ -66,6 +66,42 @@ export type Database = {
         }
         Relationships: []
       }
+      sales: {
+        Row: {
+          created_at: string
+          customer: string
+          id: string
+          items: number
+          order_id: string
+          payment_method: string
+          status: string
+          total: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer: string
+          id?: string
+          items: number
+          order_id: string
+          payment_method: string
+          status: string
+          total: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer?: string
+          id?: string
+          items?: number
+          order_id?: string
+          payment_method?: string
+          status?: string
+          total?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -89,7 +125,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      recent_activities: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_user_role: {

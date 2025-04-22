@@ -1,23 +1,16 @@
 
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Package, ShoppingCart, User } from 'lucide-react';
+import { FileText, Package, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 type Activity = {
-  id: number;
+  id: string;
   description: string;
-  type: 'sale' | 'inventory' | 'user' | 'report';
-  timestamp: string;
+  type: 'sale' | 'inventory';
+  created_at: string;
 };
-
-const activities: Activity[] = [
-  { id: 1, description: 'New sale: Order #1089', type: 'sale', timestamp: '10 minutes ago' },
-  { id: 2, description: 'Inventory updated: +50 Smart Watches', type: 'inventory', timestamp: '45 minutes ago' },
-  { id: 3, description: 'User Alex logged in', type: 'user', timestamp: '1 hour ago' },
-  { id: 4, description: 'Monthly sales report generated', type: 'report', timestamp: '2 hours ago' },
-  { id: 5, description: 'Inventory low alert: Wireless Earbuds', type: 'inventory', timestamp: '3 hours ago' },
-  { id: 6, description: 'New sale: Order #1088', type: 'sale', timestamp: '5 hours ago' },
-];
 
 const getIcon = (type: Activity['type']) => {
   switch (type) {
@@ -25,10 +18,6 @@ const getIcon = (type: Activity['type']) => {
       return <ShoppingCart className="h-4 w-4" />;
     case 'inventory':
       return <Package className="h-4 w-4" />;
-    case 'user':
-      return <User className="h-4 w-4" />;
-    case 'report':
-      return <FileText className="h-4 w-4" />;
   }
 };
 
@@ -38,14 +27,48 @@ const getIconColor = (type: Activity['type']) => {
       return 'bg-green-100 text-green-600';
     case 'inventory':
       return 'bg-blue-100 text-blue-600';
-    case 'user':
-      return 'bg-purple-100 text-purple-600';
-    case 'report':
-      return 'bg-amber-100 text-amber-600';
   }
 };
 
 export function RecentActivity() {
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  useEffect(() => {
+    // Initial fetch
+    fetchActivities();
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel('recent-activities')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'recent_activities'
+      }, () => {
+        fetchActivities();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchActivities = async () => {
+    const { data, error } = await supabase
+      .from('recent_activities')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('Error fetching activities:', error);
+      return;
+    }
+
+    setActivities(data);
+  };
+
   return (
     <Card className="col-span-1">
       <CardHeader>
@@ -61,7 +84,12 @@ export function RecentActivity() {
               </div>
               <div>
                 <p className="text-sm font-medium">{activity.description}</p>
-                <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(activity.created_at).toLocaleDateString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                  })}
+                </p>
               </div>
             </div>
           ))}
