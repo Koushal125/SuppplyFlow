@@ -3,6 +3,19 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 
+type SignInCredentials = {
+  email: string;
+  password: string;
+};
+
+type SignUpCredentials = {
+  email: string;
+  password: string;
+  options?: {
+    data?: Record<string, any>;
+  };
+};
+
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -27,14 +40,18 @@ export function useAuth() {
   }, []);
 
   // Login
-  const signIn = useCallback(async ({ email, password }: {email: string, password: string}) => {
+  const signIn = useCallback(async ({ email, password }: SignInCredentials) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
   }, []);
 
   // Signup
-  const signUp = useCallback(async ({ email, password }: {email: string, password: string}) => {
-    const { error } = await supabase.auth.signUp({ email, password });
+  const signUp = useCallback(async ({ email, password, options }: SignUpCredentials) => {
+    const { error } = await supabase.auth.signUp({ 
+      email, 
+      password, 
+      options 
+    });
     if (error) throw error;
   }, []);
 
