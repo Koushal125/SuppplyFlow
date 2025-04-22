@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import Analytics from "./pages/Analytics";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
+import Profile from "./pages/Profile";
 import { useAuth } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -76,10 +76,10 @@ const App = () => (
               }
             />
             <Route
-              path="analytics"
+              path="profile"
               element={
                 <RequireAuth>
-                  <Analytics />
+                  <Profile />
                 </RequireAuth>
               }
             />

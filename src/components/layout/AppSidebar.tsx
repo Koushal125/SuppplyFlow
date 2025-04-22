@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   BarChart, Package, ShoppingCart, FileText, 
-  Settings, LogOut, Menu, Home, Users
+  Settings, LogOut, Menu, Home, Users, UserCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -42,23 +42,13 @@ const mainNavItems: NavItem[] = [
     icon: FileText,
     href: "/reports",
   },
-  {
-    title: "Analytics",
-    icon: BarChart,
-    href: "/analytics",
-  },
 ];
 
 const bottomNavItems: NavItem[] = [
   {
-    title: "Users",
-    icon: Users,
-    href: "/users",
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    href: "/settings",
+    title: "Profile",
+    icon: UserCircle,
+    href: "/profile",
   },
 ];
 
