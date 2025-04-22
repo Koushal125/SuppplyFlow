@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronsUpDown, Eye, MoreHorizontal, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Updated mock sales data
 export type SaleItem = {
   id: string;
   orderId: string;
@@ -36,13 +37,114 @@ export type SaleItem = {
   items: number;
   total: number;
   status: "pending" | "processing" | "completed" | "cancelled";
-  paymentMethod: "credit_card" | "cash" | "bank_transfer";
+  paymentMethod: "credit_card" | "paypal" | "bank_transfer" | "cash";
 };
 
-const salesData: SaleItem[] = [];
+const salesData: SaleItem[] = [
+  {
+    id: "1",
+    orderId: "ORD-001",
+    customer: "Rajesh Kumar",
+    date: "2024-04-15",
+    items: 3,
+    total: 1499.97,
+    status: "completed",
+    paymentMethod: "credit_card",
+  },
+  {
+    id: "2",
+    orderId: "ORD-002",
+    customer: "Priya Sharma",
+    date: "2024-04-14",
+    items: 1,
+    total: 899.99,
+    status: "processing",
+    paymentMethod: "upi",
+  },
+  {
+    id: "3",
+    orderId: "ORD-003",
+    customer: "Amit Patel",
+    date: "2024-04-13",
+    items: 2,
+    total: 1049.98,
+    status: "pending",
+    paymentMethod: "bank_transfer",
+  },
+  {
+    id: "4",
+    orderId: "ORD-004",
+    customer: "Meera Singh",
+    date: "2024-04-12",
+    items: 5,
+    total: 2999.95,
+    status: "completed",
+    paymentMethod: "credit_card",
+  },
+  {
+    id: "5",
+    orderId: "ORD-005",
+    customer: "Vikram Malhotra",
+    date: "2024-04-11",
+    items: 2,
+    total: 1599.98,
+    status: "cancelled",
+    paymentMethod: "upi",
+  },
+  {
+    id: "6",
+    orderId: "ORD-006",
+    customer: "Anjali Desai",
+    date: "2024-04-10",
+    items: 4,
+    total: 2199.96,
+    status: "completed",
+    paymentMethod: "credit_card",
+  },
+  {
+    id: "7",
+    orderId: "ORD-007",
+    customer: "Rahul Verma",
+    date: "2024-04-09",
+    items: 1,
+    total: 499.99,
+    status: "processing",
+    paymentMethod: "cash",
+  },
+  {
+    id: "8",
+    orderId: "ORD-008",
+    customer: "Neha Gupta",
+    date: "2024-04-08",
+    items: 3,
+    total: 1299.97,
+    status: "completed",
+    paymentMethod: "credit_card",
+  },
+  {
+    id: "9",
+    orderId: "ORD-009",
+    customer: "Suresh Reddy",
+    date: "2024-04-07",
+    items: 2,
+    total: 1199.98,
+    status: "pending",
+    paymentMethod: "bank_transfer",
+  },
+  {
+    id: "10",
+    orderId: "ORD-010",
+    customer: "Pooja Iyer",
+    date: "2024-04-06",
+    items: 6,
+    total: 3499.94,
+    status: "completed",
+    paymentMethod: "upi",
+  },
+];
 
 const statusOptions = ["All Statuses", "pending", "processing", "completed", "cancelled"];
-const paymentOptions = ["All Payment Methods", "credit_card", "cash", "bank_transfer"];
+const paymentOptions = ["All Payment Methods", "credit_card", "upi", "bank_transfer", "cash"];
 
 function getStatusBadgeStyles(status: SaleItem["status"]) {
   switch (status) {
@@ -65,10 +167,12 @@ function getPaymentMethodLabel(method: SaleItem["paymentMethod"]) {
   switch (method) {
     case "credit_card":
       return "Credit Card";
-    case "cash":
-      return "Cash";
+    case "paypal":
+      return "PayPal";
     case "bank_transfer":
       return "Bank Transfer";
+    case "cash":
+      return "Cash";
   }
 }
 
@@ -80,65 +184,6 @@ export function SalesTable() {
     key: keyof SaleItem | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
-
-  const [salesData, setSalesData] = useState<SaleItem[]>([]);
-
-  React.useEffect(() => {
-    const fetchSales = async () => {
-      const { data, error } = await supabase
-        .from('sales')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching sales:', error);
-        return;
-      }
-
-      const formattedSales: SaleItem[] = data.map(sale => ({
-        id: sale.id,
-        orderId: sale.order_id,
-        customer: sale.customer,
-        date: new Date(sale.created_at).toISOString().split('T')[0],
-        items: sale.items,
-        total: sale.total,
-        status: sale.status as SaleItem['status'],
-        paymentMethod: sale.payment_method as SaleItem['paymentMethod']
-      }));
-
-      setSalesData(formattedSales);
-    };
-
-    fetchSales();
-
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('sales-changes')
-      .on(
-        'postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'sales' },
-        (payload) => {
-          const newSale = payload.new;
-          const formattedSale: SaleItem = {
-            id: newSale.id,
-            orderId: newSale.order_id,
-            customer: newSale.customer,
-            date: new Date(newSale.created_at).toISOString().split('T')[0],
-            items: newSale.items,
-            total: newSale.total,
-            status: newSale.status as SaleItem['status'],
-            paymentMethod: newSale.payment_method as SaleItem['paymentMethod']
-          };
-          
-          setSalesData(prev => [formattedSale, ...prev]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const filteredData = salesData.filter((item) => {
     const matchesSearch =
