@@ -12,11 +12,11 @@ type Product = {
 };
 
 const products: Product[] = [
-  { id: 1, name: 'Wireless Earbuds', category: 'Electronics', sales: 583, maxSales: 1000 },
-  { id: 2, name: 'Smart Watch', category: 'Electronics', sales: 429, maxSales: 1000 },
-  { id: 3, name: 'Running Shoes', category: 'Clothing', sales: 376, maxSales: 1000 },
-  { id: 4, name: 'Desk Lamp', category: 'Home & Living', sales: 298, maxSales: 1000 },
-  { id: 5, name: 'Protein Powder', category: 'Health', sales: 241, maxSales: 1000 },
+  { id: 1, name: 'Masala Chai', category: 'Beverages', sales: 583, maxSales: 1000 },
+  { id: 2, name: 'Basmati Rice', category: 'Groceries', sales: 429, maxSales: 1000 },
+  { id: 3, name: 'Cotton Kurta', category: 'Clothing', sales: 376, maxSales: 1000 },
+  { id: 4, name: 'Spice Box Set', category: 'Kitchen', sales: 298, maxSales: 1000 },
+  { id: 5, name: 'Ayurvedic Oil', category: 'Health', sales: 241, maxSales: 1000 },
 ];
 
 export function TopSellingProducts() {

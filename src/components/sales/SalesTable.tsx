@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Table,
@@ -29,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronsUpDown, Eye, MoreHorizontal, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Mock sales data
+// Updated mock sales data
 export type SaleItem = {
   id: string;
   orderId: string;
@@ -45,107 +44,107 @@ const salesData: SaleItem[] = [
   {
     id: "1",
     orderId: "ORD-001",
-    customer: "John Smith",
-    date: "2023-10-15",
+    customer: "Rajesh Kumar",
+    date: "2024-04-15",
     items: 3,
-    total: 149.97,
+    total: 1499.97,
     status: "completed",
     paymentMethod: "credit_card",
   },
   {
     id: "2",
     orderId: "ORD-002",
-    customer: "Sarah Johnson",
-    date: "2023-10-14",
+    customer: "Priya Sharma",
+    date: "2024-04-14",
     items: 1,
-    total: 89.99,
+    total: 899.99,
     status: "processing",
-    paymentMethod: "paypal",
+    paymentMethod: "upi",
   },
   {
     id: "3",
     orderId: "ORD-003",
-    customer: "Michael Brown",
-    date: "2023-10-13",
+    customer: "Amit Patel",
+    date: "2024-04-13",
     items: 2,
-    total: 104.98,
+    total: 1049.98,
     status: "pending",
     paymentMethod: "bank_transfer",
   },
   {
     id: "4",
     orderId: "ORD-004",
-    customer: "Emily Davis",
-    date: "2023-10-12",
+    customer: "Meera Singh",
+    date: "2024-04-12",
     items: 5,
-    total: 299.95,
+    total: 2999.95,
     status: "completed",
     paymentMethod: "credit_card",
   },
   {
     id: "5",
     orderId: "ORD-005",
-    customer: "David Wilson",
-    date: "2023-10-11",
+    customer: "Vikram Malhotra",
+    date: "2024-04-11",
     items: 2,
-    total: 159.98,
+    total: 1599.98,
     status: "cancelled",
-    paymentMethod: "paypal",
+    paymentMethod: "upi",
   },
   {
     id: "6",
     orderId: "ORD-006",
-    customer: "Jessica Martinez",
-    date: "2023-10-10",
+    customer: "Anjali Desai",
+    date: "2024-04-10",
     items: 4,
-    total: 219.96,
+    total: 2199.96,
     status: "completed",
     paymentMethod: "credit_card",
   },
   {
     id: "7",
     orderId: "ORD-007",
-    customer: "Robert Taylor",
-    date: "2023-10-09",
+    customer: "Rahul Verma",
+    date: "2024-04-09",
     items: 1,
-    total: 49.99,
+    total: 499.99,
     status: "processing",
     paymentMethod: "cash",
   },
   {
     id: "8",
     orderId: "ORD-008",
-    customer: "Jennifer Anderson",
-    date: "2023-10-08",
+    customer: "Neha Gupta",
+    date: "2024-04-08",
     items: 3,
-    total: 129.97,
+    total: 1299.97,
     status: "completed",
     paymentMethod: "credit_card",
   },
   {
     id: "9",
     orderId: "ORD-009",
-    customer: "William Thomas",
-    date: "2023-10-07",
+    customer: "Suresh Reddy",
+    date: "2024-04-07",
     items: 2,
-    total: 119.98,
+    total: 1199.98,
     status: "pending",
     paymentMethod: "bank_transfer",
   },
   {
     id: "10",
     orderId: "ORD-010",
-    customer: "Lisa Jackson",
-    date: "2023-10-06",
+    customer: "Pooja Iyer",
+    date: "2024-04-06",
     items: 6,
-    total: 349.94,
+    total: 3499.94,
     status: "completed",
-    paymentMethod: "credit_card",
+    paymentMethod: "upi",
   },
 ];
 
 const statusOptions = ["All Statuses", "pending", "processing", "completed", "cancelled"];
-const paymentOptions = ["All Payment Methods", "credit_card", "paypal", "bank_transfer", "cash"];
+const paymentOptions = ["All Payment Methods", "credit_card", "upi", "bank_transfer", "cash"];
 
 function getStatusBadgeStyles(status: SaleItem["status"]) {
   switch (status) {
@@ -186,7 +185,6 @@ export function SalesTable() {
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
 
-  // Filter sales data based on search, status, and payment method
   const filteredData = salesData.filter((item) => {
     const matchesSearch =
       item.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -199,7 +197,6 @@ export function SalesTable() {
     return matchesSearch && matchesStatus && matchesPayment;
   });
 
-  // Sort data based on sort configuration
   const sortedData = [...filteredData].sort((a, b) => {
     if (!sortConfig.key) return 0;
     
@@ -219,7 +216,6 @@ export function SalesTable() {
     return 0;
   });
 
-  // Handle sorting
   const handleSort = (key: keyof SaleItem) => {
     setSortConfig({
       key,

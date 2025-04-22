@@ -3,18 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const data = [
-  { month: 'Jan', sales: 12000 },
-  { month: 'Feb', sales: 15000 },
-  { month: 'Mar', sales: 18000 },
-  { month: 'Apr', sales: 14000 },
-  { month: 'May', sales: 19000 },
-  { month: 'Jun', sales: 22000 },
-  { month: 'Jul', sales: 25000 },
-  { month: 'Aug', sales: 27000 },
-  { month: 'Sep', sales: 30000 },
-  { month: 'Oct', sales: 29000 },
-  { month: 'Nov', sales: 32000 },
-  { month: 'Dec', sales: 38000 },
+  { month: 'Jan', sales: 120000 },
+  { month: 'Feb', sales: 150000 },
+  { month: 'Mar', sales: 180000 },
+  { month: 'Apr', sales: 140000 },
+  { month: 'May', sales: 190000 },
+  { month: 'Jun', sales: 220000 },
+  { month: 'Jul', sales: 250000 },
+  { month: 'Aug', sales: 270000 },
+  { month: 'Sep', sales: 300000 },
+  { month: 'Oct', sales: 290000 },
+  { month: 'Nov', sales: 320000 },
+  { month: 'Dec', sales: 380000 },
 ];
 
 export function SalesChart() {

@@ -3,12 +3,12 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recha
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const data = [
-  { category: 'Electronics', stock: 45, optimum: 60 },
+  { category: 'Groceries', stock: 45, optimum: 60 },
   { category: 'Clothing', stock: 25, optimum: 30 },
-  { category: 'Furniture', stock: 10, optimum: 15 },
-  { category: 'Books', stock: 30, optimum: 20 },
-  { category: 'Toys', stock: 15, optimum: 25 },
-  { category: 'Sports', stock: 20, optimum: 20 },
+  { category: 'Kitchen', stock: 30, optimum: 35 },
+  { category: 'Health', stock: 20, optimum: 25 },
+  { category: 'Beverages', stock: 15, optimum: 20 },
+  { category: 'Handicrafts', stock: 10, optimum: 15 },
 ];
 
 export function InventoryLevelChart() {
