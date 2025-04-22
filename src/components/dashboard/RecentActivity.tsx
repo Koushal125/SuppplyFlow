@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 type Activity = {
   id: string;
   description: string;
-  type: 'sale' | 'inventory';
+  type: string; // Changed from 'sale' | 'inventory' to string to match DB response
   created_at: string;
 };
 
@@ -18,6 +18,8 @@ const getIcon = (type: Activity['type']) => {
       return <ShoppingCart className="h-4 w-4" />;
     case 'inventory':
       return <Package className="h-4 w-4" />;
+    default:
+      return <FileText className="h-4 w-4" />;
   }
 };
 
@@ -27,6 +29,8 @@ const getIconColor = (type: Activity['type']) => {
       return 'bg-green-100 text-green-600';
     case 'inventory':
       return 'bg-blue-100 text-blue-600';
+    default:
+      return 'bg-gray-100 text-gray-600';
   }
 };
 
@@ -66,7 +70,7 @@ export function RecentActivity() {
       return;
     }
 
-    setActivities(data);
+    setActivities(data as Activity[]);
   };
 
   return (

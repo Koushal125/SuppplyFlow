@@ -26,16 +26,24 @@ export function SalesForm() {
     try {
       const orderId = Math.random().toString(36).substring(7).toUpperCase();
       
+      // Get the current user first
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        throw new Error("User not authenticated");
+      }
+      
       const { error } = await supabase
         .from('sales')
-        .insert([{
+        .insert({
           order_id: orderId,
           customer: fields.customer,
           items: parseInt(fields.items),
           total: parseFloat(fields.total),
           payment_method: fields.payment_method,
-          status: fields.status
-        }]);
+          status: fields.status,
+          user_id: user.id
+        });
 
       if (error) throw error;
       
